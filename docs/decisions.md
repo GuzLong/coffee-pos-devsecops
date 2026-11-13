@@ -39,6 +39,6 @@ Known gap: `POST /menu` has no auth yet — anyone can add menu items once deplo
 |---|---|---|
 | Manual deploy time (before Phase 5) | | |
 | Pipeline deploy time | | |
-| Image size: single-stage → multi-stage | | |
+| Image size: naive single-stage (`python:3.12`, root) → multi-stage (`3.12-slim`, non-root) | 1.73 GB → 275 MB (−84%); most of the cut is the slim base | 2026-11-13 |
 | Trivy / CodeQL findings: first run → fixed | | |
 | Terraform full rebuild time | | |
