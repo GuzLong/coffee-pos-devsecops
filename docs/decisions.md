@@ -20,6 +20,20 @@ Settings → Branches → Add branch ruleset (or classic rule) for `main`:
 
 Verify: `git push origin main` directly should be rejected.
 
+## Phase 1 — App + Docker
+
+| Chosen | Rejected | Why |
+|---|---|---|
+| SQLAlchemy `create_all` at startup | Alembic migrations | Schema is tiny and unreleased; add Alembic once it changes after first deploy |
+| SQLite in-memory for unit tests | Postgres in tests | Tests run in <1s with no Docker; Postgres compatibility proven by `docker compose up` |
+| `prometheus-fastapi-instrumentator` | Hand-written `prometheus_client` middleware | One line gives request count/latency per route |
+| Multi-stage build, venv copied to `python:3.12-slim`, UID 10001 | Single-stage, root user | Smaller image, no pip/build tools at runtime, container escape doesn't land as root |
+| `/health` checks the DB | Static 200 | Deploy rollback (Phase 5) should trigger when the app can't reach its DB |
+| Order stores `unit_price` per line; total computed server-side | Trust client total | Client can't set its own price; old orders keep historical prices |
+| Compose binds API to `127.0.0.1` only | `0.0.0.0` | Local dev shouldn't be reachable from the LAN; Caddy fronts it in prod |
+
+Known gap: `POST /menu` has no auth yet — anyone can add menu items once deployed. Revisit before Phase 5.
+
 ## Measurements
 | Metric | Value | Date |
 |---|---|---|
