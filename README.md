@@ -3,7 +3,7 @@
 A small coffee-shop POS API deployed to Azure by a fully automated, security-gated pipeline.
 The app is the payload; the pipeline and infrastructure are the point.
 
-> Status: Phase 0 — setup. Sections below fill in as each phase lands.
+> Status: Phase 1 — app + Docker. Sections below fill in as each phase lands.
 
 ## Live demo
 _TBD (Phase 5)_ — `https://<subdomain>.duckdns.org`
@@ -26,7 +26,29 @@ build image to GHCR → SSH deploy to VM → `/health` check (rollback on fail) 
 | Monitoring | Prometheus, Grafana, node_exporter, Discord alerts |
 
 ## Run locally
-_TBD (Phase 1)_
+Requires Docker.
+```bash
+cp .env.example .env        # then set POSTGRES_PASSWORD (URL-safe characters only)
+docker compose up --build
+```
+- API docs: http://localhost:8000/docs
+- Health: http://localhost:8000/health · Metrics: http://localhost:8000/metrics
+
+Tests (no Docker needed; uses in-memory SQLite):
+```bash
+python -m venv .venv && .venv/bin/pip install -r app/requirements-dev.txt
+cd app && ../.venv/bin/pytest && ../.venv/bin/ruff check .
+```
+
+### API
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/menu` | List menu items |
+| POST | `/menu` | `{"name", "price"}`; 409 on duplicate name |
+| POST | `/orders` | `{"items": [{"menu_item_id", "quantity"}]}`; total computed server-side |
+| GET | `/orders/{id}` | |
+| GET | `/health` | 200 if DB reachable, else 503 — used by deploy health check |
+| GET | `/metrics` | Prometheus format |
 
 ## Security controls
 _TBD (Phase 3–4)_
