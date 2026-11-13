@@ -1,9 +1,11 @@
 # coffee-pos-devsecops
 
+[![CI](https://github.com/GuzLong/coffee-pos-devsecops/actions/workflows/ci.yml/badge.svg)](https://github.com/GuzLong/coffee-pos-devsecops/actions/workflows/ci.yml)
+
 A small coffee-shop POS API deployed to Azure by a fully automated, security-gated pipeline.
 The app is the payload; the pipeline and infrastructure are the point.
 
-> Status: Phase 1 — app + Docker. Sections below fill in as each phase lands.
+> Status: Phase 2 — CI. Sections below fill in as each phase lands.
 
 ## Live demo
 _TBD (Phase 5)_ — `https://<subdomain>.duckdns.org`
@@ -49,6 +51,13 @@ cd app && ../.venv/bin/pytest && ../.venv/bin/ruff check .
 | GET | `/orders/{id}` | |
 | GET | `/health` | 200 if DB reachable, else 503 — used by deploy health check |
 | GET | `/metrics` | Prometheus format |
+
+## CI
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every PR and push to `main`:
+1. **lint-test** — `ruff check`, `ruff format --check`, `pytest`
+2. **build** — `docker build` of `app/` (runs only if lint-test passes)
+
+Branch protection on `main` requires both checks, so a failing test blocks the merge.
 
 ## Security controls
 _TBD (Phase 3–4)_

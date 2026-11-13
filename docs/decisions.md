@@ -34,6 +34,18 @@ Verify: `git push origin main` directly should be rejected.
 
 Known gap: `POST /menu` has no auth yet — anyone can add menu items once deployed. Revisit before Phase 5.
 
+## Phase 2 — CI
+
+| Chosen | Rejected | Why |
+|---|---|---|
+| Actions pinned to full commit SHA (tag in comment) | `@v7` tags | Tags can be moved to malicious code (tj-actions/changed-files, 2025); a SHA can't. Dependabot bumps them in Phase 3 |
+| `permissions: contents: read` at workflow level | Default token permissions | Least privilege; a compromised step can't push or write packages |
+| Plain `docker build` | `docker/build-push-action` + Buildx | Nothing to push or cache yet; one fewer third-party action. Revisit in Phase 5 |
+| `ruff format --check` in CI | Lint only | Formatting diffs never reach review |
+| Build job `needs: lint-test` | Parallel jobs | Don't spend runner minutes building code that fails tests |
+
+Merge gate: branch protection requires `lint-test` and `build` status checks (add them in the ruleset after the first run).
+
 ## Measurements
 | Metric | Value | Date |
 |---|---|---|
